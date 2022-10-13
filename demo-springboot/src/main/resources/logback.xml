@@ -1,0 +1,59 @@
+<configuration scan="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="smartthings.logging.logback.DynamicThresholdLoggerFilter">
+            <DefaultThreshold>DEBUG</DefaultThreshold>
+            <Logger>com.smartthings</Logger>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <jsonFactoryDecorator class="net.logstash.logback.decorate.CharacterEscapesJsonFactoryDecorator">
+                <!-- Prevent escaping so that stack traces are readable -->
+                <includeStandardAsciiEscapesForJSON>false</includeStandardAsciiEscapesForJSON>
+            </jsonFactoryDecorator>
+
+            <providers>
+                <timestamp>
+                    <fieldName>time</fieldName>
+                </timestamp>
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "time": "%d{HH:mm:ss.SSS}",
+                        "thread": "%t",
+                        "level": "%-5level",
+                        "loggingId": "%X{loggingId}",
+                        "logger": "%C.%L",
+                        "traceId": "%X{dd.trace_id}",
+                        "spanId": "%X{dd.span_id}",
+                        "message": "%msg"
+                        }
+                    </pattern>
+                </pattern>
+                <nestedField>
+                    <fieldName>data</fieldName>
+                    <providers>
+                        <arguments/>
+                        <logstashMarkers/>
+                    </providers>
+                </nestedField>
+                <stackTrace>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <maxLength>2048</maxLength>
+                        <shortenedClassNameLength>20</shortenedClassNameLength>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+            </providers>
+        </encoder>
+    </appender>
+
+    <logger name="com.smartthings" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

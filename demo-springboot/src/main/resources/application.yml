@@ -1,0 +1,122 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      statsd:
+        enabled: true
+        flavor: DATADOG
+        port: 8125
+        prefix: recipe-service
+      jmx:
+        enabled: true
+
+datadog:
+  enabled: false
+
+server:
+  port: 8081
+  forward-headers-strategy: FRAMEWORK
+  error:
+    include-stacktrace: always
+
+req-metrics:
+  enabled: true
+
+config:
+  smartthings:
+    siam:
+      baseUrl: PLACEHOLDER
+      retries: 5
+      backoffSeconds: 10
+    api:
+      baseUrl: PLACEHOLDER
+      retries: 5
+      backoffSeconds: 10
+      rules:
+        enabled: true
+  share-code:
+    maxRetries: 3
+
+auth:
+  baseUrl: PLACEHOLDER
+  clientId: PLACEHOLDER
+  clientSecret: PLACEHOLDER
+  cacheTTL: 10m
+  enabled: true
+
+jwt:
+  enabled: true
+  jwkSetUrl: PLACEHOLDER
+  supportedJWSAlgorithms:
+    - "RS256"
+
+spring:
+  application:
+    name: Hub Observer Service
+    banner-mode: "off"
+  profiles:
+    active: local
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod-us-east-2
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod-ap-northeast-2
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod-eu-west-1
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod-us-east-1
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: acc-us-east-2
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: stg-us-east-1
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: stg-eu-west-1
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev-us-east-1
