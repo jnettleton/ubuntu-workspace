@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 
 private const val HUB_OBSERVER_LOG_NAME = "demo-webapi" // all lowercase
 
@@ -28,14 +29,15 @@ class LogController {
     )
 
     private val x: Int;
-    private val sumoLogs: HashMap<String, Logger>
+    private val sumoLogs: HashMap<String, String>
+    private val logger: Logger = LoggerFactory.getLogger("demo-app")
 
     constructor() {
         println("primary constructor")
         x = 5;
 
         // create list of valid log names from "/etc/sumo-sources.json"
-        sumoLogs = HashMap<String, Logger>()
+        sumoLogs = HashMap<String, String>()
         val fullJsonContent = """
         {
             "api.version": "v1",
@@ -93,8 +95,13 @@ class LogController {
             val logName = fullName.substringBeforeLast(".").lowercase()
 
             if (logName == HUB_OBSERVER_LOG_NAME) continue
-            val logger = LoggerFactory.getLogger(logName)
-            sumoLogs.put(logName, logger)
+            // val logger = LoggerFactory.getLogger(logName)
+            // sumoLogs.put(logName, logger)
+            if (!sumoLogs.containsKey(logName)) {
+                sumoLogs.put(logName, fullPath)
+            } else {
+                logger.error("Duplicate log name detected: '$logName' - '$fullPath'")
+            }
         }
     }
 
@@ -114,9 +121,15 @@ class LogController {
     fun postLogMessages(@PathVariable name:String, @RequestBody nft: NFT): NFT { // 3
         val logName = name.lowercase()
         // if (!sumoLogs.containsKey(logName)) throw LogNotFoundException()
-        val logger: Logger = sumoLogs.get(logName) ?: throw LogNotFoundException()
+        val logFullPath: String = sumoLogs.get(logName) ?: throw LogNotFoundException()
 
-        logger.error("test error")
+        MDC.put("logFileName", logFullPath)
+        try {
+            logger.error("test error")
+        }
+        finally {
+            MDC.remove("logFileName")
+        }
 
         val maxId = NFTs.map { it.id }.maxOrNull() ?: 0 // 4
         val nextId = maxId + 1 // 5

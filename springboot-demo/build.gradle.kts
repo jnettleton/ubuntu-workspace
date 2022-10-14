@@ -1,5 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val kotlinVersion: String by project
+val kotlinLoggingVersion: String by project
+val logbackVersion: String by project
+
 plugins {
 	id("org.springframework.boot") version "2.7.4"
 	id("io.spring.dependency-management") version "1.0.14.RELEASE"
@@ -22,8 +26,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-	implementation("ch.qos.logback:logback-classic")
-	implementation("ch.qos.logback:logback-core")
+	implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+	implementation("ch.qos.logback:logback-classic:$logbackVersion")
+	implementation("ch.qos.logback:logback-core:$logbackVersion")
 	implementation("net.logstash.logback:logstash-logback-encoder:7.2")
 }
 

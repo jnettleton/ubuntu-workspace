@@ -6,6 +6,7 @@ import org.springframework.boot.runApplication
 import com.fasterxml.jackson.module.kotlin.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
@@ -21,6 +22,14 @@ public class DemoApplication {
     @EventListener
     fun onStartup(event: ApplicationReadyEvent?) {
         logger.info(String.format("Application running http://localhost:%s", port))
+
+        MDC.put("logFileName", "demo-webapi.log")
+        try {
+            logger.error("test error")
+        }
+        finally {
+            MDC.remove("logFileName")
+        }
     }
 }
 
