@@ -14,7 +14,7 @@ management:
         enabled: true
         flavor: DATADOG
         port: 8125
-        prefix: recipe-service
+        prefix: demo-webapi
       jmx:
         enabled: true
 
@@ -27,31 +27,6 @@ server:
   error:
     include-stacktrace: always
 
-req-metrics:
-  enabled: true
-
-config:
-  smartthings:
-    siam:
-      baseUrl: PLACEHOLDER
-      retries: 5
-      backoffSeconds: 10
-    api:
-      baseUrl: PLACEHOLDER
-      retries: 5
-      backoffSeconds: 10
-      rules:
-        enabled: true
-  share-code:
-    maxRetries: 3
-
-auth:
-  baseUrl: PLACEHOLDER
-  clientId: PLACEHOLDER
-  clientSecret: PLACEHOLDER
-  cacheTTL: 10m
-  enabled: true
-
 jwt:
   enabled: true
   jwkSetUrl: PLACEHOLDER
@@ -60,7 +35,7 @@ jwt:
 
 spring:
   application:
-    name: Hub Observer Service
+    name: Demo Web API
     banner-mode: "off"
   profiles:
     active: local

@@ -12,6 +12,10 @@ import com.example.demo.model.NFT
 import com.example.demo.exception.LogNotFoundException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+private const val HUB_OBSERVER_LOG_NAME = "demo-webapi" // all lowercase
 
 @RestController
 class LogController {
@@ -24,14 +28,14 @@ class LogController {
     )
 
     private val x: Int;
-    private val sumoLogs: HashMap<String, String>
+    private val sumoLogs: HashMap<String, Logger>
 
     constructor() {
         println("primary constructor")
         x = 5;
 
         // create list of valid log names from "/etc/sumo-sources.json"
-        sumoLogs = HashMap<String, String>()
+        sumoLogs = HashMap<String, Logger>()
         val fullJsonContent = """
         {
             "api.version": "v1",
@@ -47,21 +51,32 @@ class LogController {
                     "forceTimeZone": false,
                     "timeZone": "UTC",
                     "filters": [
-                        {
-                            "filterType": "Exclude",
-                            "name": "Exclude TRACE level",
-                            "regexp": "(?s).*TRACE(?s).*"
-                        },
-                        {
-                            "filterType": "Exclude",
-                            "name": "Exclude DEBUG level",
-                            "regexp": "(?s).*DEBUG(?s).*"
-                        }
+                        { "filterType": "Exclude", "name": "Exclude TRACE level", "regexp": "(?s).*TRACE(?s).*" },
+                        { "filterType": "Exclude", "name": "Exclude DEBUG level", "regexp": "(?s).*DEBUG(?s).*" }
                     ],
                     "encoding": "UTF-8",
                     "pathExpression": "/var/log/demo/demoLog.log",
-                    "blacklist": [
+                    "blacklist": [],
+                    "sourceType": "LocalFile",
+                    "alive": true
+                },
+                {
+                    "name": "demo-webapi-log",
+                    "hostName": "demo-host",
+                    "category": "demo-dev",
+                    "automaticDateParsing": true,
+                    "multilineProcessingEnabled": true,
+                    "useAutolineMatching": false,
+                    "manualPrefixRegexp": "timestamp=.*",
+                    "forceTimeZone": false,
+                    "timeZone": "UTC",
+                    "filters": [
+                        { "filterType": "Exclude", "name": "Exclude TRACE level", "regexp": "(?s).*TRACE(?s).*" },
+                        { "filterType": "Exclude", "name": "Exclude DEBUG level", "regexp": "(?s).*DEBUG(?s).*" }
                     ],
+                    "encoding": "UTF-8",
+                    "pathExpression": "/var/log/demo/demo-webapi.log",
+                    "blacklist": [],
                     "sourceType": "LocalFile",
                     "alive": true
                 }
@@ -75,11 +90,12 @@ class LogController {
         for (sourceNode: JsonNode in sourcesNode) {
             var fullPath = sourceNode.get("pathExpression").asText()
             val fullName = fullPath.substringAfterLast("/")
-            val fileName = fullName.substringBeforeLast(".").lowercase()
+            val logName = fullName.substringBeforeLast(".").lowercase()
 
-            sumoLogs.put(fileName, fullName)
+            if (logName == HUB_OBSERVER_LOG_NAME) continue
+            val logger = LoggerFactory.getLogger(logName)
+            sumoLogs.put(logName, logger)
         }
-
     }
 
     @GetMapping("/")
@@ -96,7 +112,11 @@ class LogController {
     @PostMapping("/log/{name}") // 1
     @ResponseStatus(HttpStatus.CREATED) // 2
     fun postLogMessages(@PathVariable name:String, @RequestBody nft: NFT): NFT { // 3
-        if (!sumoLogs.containsKey(name.lowercase())) throw LogNotFoundException()
+        val logName = name.lowercase()
+        // if (!sumoLogs.containsKey(logName)) throw LogNotFoundException()
+        val logger: Logger = sumoLogs.get(logName) ?: throw LogNotFoundException()
+
+        logger.error("test error")
 
         val maxId = NFTs.map { it.id }.maxOrNull() ?: 0 // 4
         val nextId = maxId + 1 // 5
