@@ -1,1 +1,2 @@
-rootProject.name = "demo"
+rootProject.name = "springboot-demo"
+include("springboot-demo-webapi")
