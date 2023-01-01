@@ -1,0 +1,34 @@
+{
+  "api.version": "v1",
+  "sources": [
+    {
+      "name": "alliance",
+      "hostName": "na04a_useast2-i-06e19c97a73f96778",
+      "category": "app-acceptance",
+      "automaticDateParsing": true,
+      "multilineProcessingEnabled": true,
+      "useAutolineMatching": false,
+      "manualPrefixRegexp": "timestamp=.*",
+      "forceTimeZone": false,
+      "timeZone": "UTC",
+      "filters": [
+        {
+          "filterType": "Exclude",
+          "name": "Exclude TRACE level",
+          "regexp": "(?s).*TRACE(?s).*"
+        },
+        {
+          "filterType": "Exclude",
+          "name": "Exclude DEBUG level",
+          "regexp": "(?s).*DEBUG(?s).*"
+        }
+      ],
+      "encoding": "UTF-8",
+      "pathExpression": "/var/log/alliance/alliance.log",
+      "blacklist": [
+      ],
+      "sourceType": "LocalFile",
+      "alive": true
+    }
+  ]
+}
