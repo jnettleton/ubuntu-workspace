@@ -19,7 +19,7 @@ impl Timer {
             ready: true,
         }
     }
-    
+
     pub fn update(&mut self) {
         let now = Instant::now();
         self.delta = now - self.last_instant;
