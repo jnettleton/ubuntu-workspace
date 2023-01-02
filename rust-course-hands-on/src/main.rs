@@ -1,68 +1,33 @@
-use clap::{App, Arg};
-use core::num;
-use std::env;
-use std::fs::File;
-use std::io::{self, BufReader, BufWriter, ErrorKind, Read, Result, Write};
-
-const CHUNK_SIZE: usize = 16 * 1024;
+use pipeviewer::{args::Args, read, stats, write};
+use std::io::Result;
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 fn main() -> Result<()> {
-    let matches = App::new("pipeviewer")
-        .arg(Arg::with_name("infile").help("Read from a file instead of stdin."))
-        .arg(
-            Arg::with_name("outfile")
-                .short("o")
-                .long("outfile")
-                .takes_value(true)
-                .help("Write output to a file instead of stdout."),
-        )
-        .arg(Arg::with_name("silent").short("s").long("silent"))
-        .get_matches();
+    let args = Args::parse();
+    let Args {
+        infile,
+        outfile,
+        silent
+    } = args;
 
-    let infile = matches.value_of("infile").unwrap_or_default();
-    let outfile = matches.value_of("outfile").unwrap_or_default();
-    let silent = if matches.is_present("silent") {
-        true
-    } else {
-        !env::var("PV_SILENT").unwrap_or_default().is_empty()
-    };
+    let quit = Arc::new(Mutex::new(false));
+    let (quit1, quit2, quit3) = (quit.clone(), quit.clone(), quit.clone());
 
-    let mut reader: Box<dyn Read> = if !infile.is_empty() {
-        Box::new(File::open(infile)?)
-    } else {
-        Box::new(io::stdin())
-    };
+    let read_handle = thread::spawn(move || read::read_loop(&infile, quit1));
+    let stats_handle = thread::spawn(move || stats::stats_loop(silent, quit2));
+    let write_handle = thread::spawn(move || write::write_loop(&outfile, quit3));
 
-    let mut writer: Box<dyn Write> = if !outfile.is_empty() {
-        Box::new(File::create(outfile)?)
-    } else {
-        Box::new(io::stdout())
-    };
+    // crash if any thread have crashed
+    // '.join()' returns a 'thread::Result<io::Result<()>>'
+    let read_io_result = read_handle.join().unwrap();
+    let stats_io_rsult = stats_handle.join().unwrap();
+    let write_io_result = write_handle.join().unwrap();
 
-    let mut total_bytes = 0;
-    let mut buffer = [0; CHUNK_SIZE];
-
-    loop {
-        let num_read = match reader.read(&mut buffer) {
-            Ok(0) => break,
-            Ok(x) => x,
-            Err(_) => break,
-        };
-        total_bytes += num_read;
-        if !silent {
-            eprintln!("\r{}", total_bytes);
-        }
-        if let Err(e) = writer.write_all(&buffer[..num_read]) {
-            if e.kind() == ErrorKind::BrokenPipe {
-                break;
-            }
-            return Err(e);
-        }
-    }
-
-    if !silent {
-        eprintln!("\r{}", total_bytes);
-    }
+    // return an error if any threads returned an error
+    read_io_result?;
+    stats_io_rsult?;
+    write_io_result?;
 
     Ok(())
 }
