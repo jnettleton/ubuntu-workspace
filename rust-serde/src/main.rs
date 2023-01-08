@@ -38,3 +38,4 @@ fn main() {
     let foo_json = serde_json::to_string(&f).unwrap();
     println!("{:?}", foo_json);
 }
+
