@@ -1,3 +1,4 @@
+use std::fs;
 use serde_derive::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -37,5 +38,11 @@ fn main() {
 
     let foo_json = serde_json::to_string(&f).unwrap();
     println!("{:?}", foo_json);
-}
 
+    let _sumo_file = fs::read_to_string("/etc/sumo-sources.json");
+
+    // let mut sumo_nodes = serde_json::Deserializer::from_str(sumo_file.as_str());
+
+    // let sumo_string = serde_json::Serializer::from(sumo_nodes);
+    // println!("{:?}", sumo_string);
+}
