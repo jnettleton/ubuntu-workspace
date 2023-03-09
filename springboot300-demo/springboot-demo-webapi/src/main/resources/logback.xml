@@ -1,0 +1,27 @@
+<configuration scan="true">
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>logFileName</key>
+            <defaultValue>demo-default.log</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${logFileName}" class="ch.qos.logback.core.FileAppender">
+                <file>${logFileName}</file>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d{HH:mm:ss:SSS} | %-5level | %thread | %logger{20} | %msg%n%rEx</pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
+
+    <root level="ALL">
+        <appender-ref ref="SIFT" />
+    </root>
+
+    <logger name="com.example.demo" level="INFO"/>
+
+<!--    <root level="INFO">-->
+<!--        <appender-ref ref="STDOUT" />-->
+<!--    </root>-->
+
+</configuration>
