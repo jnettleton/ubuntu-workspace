@@ -1,5 +1,23 @@
 use std::fmt;
 
+pub static FILTER_NAMES: [&'static str; 3] = ["Info", "Warn", "Error"];
+
+impl FilterLevel {
+    /// Convert to `str` from `LOG_LEVEL_NAMES`
+    pub fn as_str(&self) -> &'static str {
+        FILTER_NAMES[self.as_usize()]
+    }
+
+    #[inline]
+    pub fn as_usize(&self) -> usize {
+        match *self {
+            FilterLevel::Info => 0,
+            FilterLevel::Warn => 1,
+            FilterLevel::Error => 2,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum FilterLevel {
     Info,
@@ -19,5 +37,6 @@ fn main() {
     // let level_str = level.to_str();
 
     println!("Level: {}", level); // Debug
+    println!("Level: {}", level.as_str()); // as_str()
     println!("Level: {}", level_string); // fmt::Display
 }
