@@ -36,6 +36,7 @@ fn main() {
     let level_string = level.to_string();
     // let level_str = level.to_str();
 
+    // println!("Level: {}", &level as i16);
     println!("Level: {}", level); // Debug
     println!("Level: {}", level.as_str()); // as_str()
     println!("Level: {}", level_string); // fmt::Display
