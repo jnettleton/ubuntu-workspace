@@ -1,9 +1,8 @@
 use std::fmt;
 
 pub static FILTER_NAMES: [&'static str; 3] = ["Info", "Warn", "Error"];
-
 impl FilterLevel {
-    /// Convert to `str` from `LOG_LEVEL_NAMES`
+    /// Convert to `str` from `FILTER_NAMES`
     pub fn as_str(&self) -> &'static str {
         FILTER_NAMES[self.as_usize()]
     }

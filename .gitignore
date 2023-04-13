@@ -8,7 +8,6 @@
 .attach_pid*
 .metadata
 .recommenders
-.vscode
 /code
 MANIFEST.MF
 _site/
@@ -63,5 +62,3 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
