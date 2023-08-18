@@ -2,16 +2,23 @@ use std::fs;
 use serde_derive::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Foo {
     a: String,
     b: u64,
+    // #[serde(rename="hubEui")]
+    hub_eui: String,
+    // #[serde(rename="hubId")]
+    hub_id: String,
 }
 
 impl Foo {
     fn new(a: &str, b: u64) -> Self {
         Self {
             a: a.to_string(),
-            b
+            b,
+            hub_eui: "eui".to_string(),
+            hub_id: "".to_string(),
         }
     }
 }
