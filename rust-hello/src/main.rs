@@ -1,3 +1,5 @@
+use std::mem;
+
 enum Test {
     Red,
     Blue,
@@ -63,11 +65,15 @@ fn main() {
     let log_message_size: usize = 50;
     current_queue_size = current_queue_size.saturating_sub(log_message_size);
 
+    let mut _size = mem::size_of_val(&current_queue_size);
+    let ch: u8 = 0;
+    _size = mem::size_of_val(&ch);
+
     let id: Option<String> = Some(String::from("id"));
-    let _id_len = id.map(|s| s.len()).unwrap_or(0);
+    let _id_len = id.as_ref().map(|s| s.len()).unwrap_or(0);
 
     let id2: Option<String> = None;
-    let _id2_len = id2.map(|s| s.len()).unwrap_or(0);
+    let _id2_len = id2.as_ref().map(|s| s.len()).unwrap_or(0);
 
     // let test: &str = Test::Blue.into();
     // println!("Test - {}", test);

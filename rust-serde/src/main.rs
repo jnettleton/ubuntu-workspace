@@ -7,9 +7,9 @@ struct Foo {
     a: String,
     b: u64,
     // #[serde(rename="hubEui")]
-    hub_eui: String,
+    hub_eui: Option<String>,
     // #[serde(rename="hubId")]
-    hub_id: String,
+    hub_id: Option<String>,
 }
 
 impl Foo {
@@ -17,8 +17,8 @@ impl Foo {
         Self {
             a: a.to_string(),
             b,
-            hub_eui: "eui".to_string(),
-            hub_id: "".to_string(),
+            hub_eui: Some("eui".to_string()),
+            hub_id: None,
         }
     }
 }
@@ -42,6 +42,12 @@ fn main() {
     let foo2 = Foo::new("It's that simple.", 101);
     f.items.push(foo1);
     f.items.push(foo2);
+
+    let test1: Option<String> = Some(String::from("test"));
+    let _len1 = match test1 { Some(s) => s.as_str().len(), None => 0 };
+    let test2: Option<String> = None;
+    let _len2 = match &test2 { Some(s) => s.len(), None => 0 };
+    let _len3 = match &test2 { Some(s) => s.len(), None => 0 };
 
     let foo_json = serde_json::to_string(&f).unwrap();
     println!("{:?}", foo_json);
