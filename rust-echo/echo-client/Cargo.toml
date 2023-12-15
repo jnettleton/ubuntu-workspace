@@ -2,4 +2,7 @@
 name = "echo-client"
 version = "0.1.0"
 authors = ["Jerry Nettleton"]
+edition = "2018"
 
+[dependencies]
+tokio = { version = "1.35.0", features = ["net", "io-util", "rt", "rt-multi-thread", "macros"] }
